@@ -17,17 +17,26 @@ function EditExercise() {
 
   const navigate = useNavigate();
   const { id } = useParams();
-  // const inputRef = useRef();
+
+  const handleChange = (e) => {
+    let name = "";
+    let value = "";
+    if (!(e instanceof Date)) {
+      name = e.target.name;
+      value = e.target.value;
+    } else {
+      name = "date";
+      value = e;
+    }
+    setExerciseInfo({ ...exerciseInfo, [name]: value });
+  };
 
   // Form submit handler - Update exercise
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const updateExercise = {
-      username: exerciseInfo.username,
-      description: exerciseInfo.description,
-      duration: exerciseInfo.duration,
-      date: exerciseInfo.date,
+      ...exerciseInfo,
     };
 
     axios
@@ -37,14 +46,6 @@ function EditExercise() {
         navigate("/");
       })
       .catch((err) => console.log(err));
-
-    // Reset exercise states
-    setExerciseInfo({
-      ...exerciseInfo,
-      description: "",
-      duration: "",
-      date: new Date(),
-    });
   };
 
   useEffect(() => {
@@ -52,11 +53,12 @@ function EditExercise() {
     axios
       .get(`http://localhost:5000/exercises/${id}`)
       .then((res) => {
+        const { username, description, duration, date } = res.data;
         setExerciseInfo({
-          username: res.data.username,
-          description: res.data.description,
-          duration: res.data.duration,
-          date: new Date(res.data.date),
+          username,
+          description,
+          duration,
+          date: new Date(date),
         });
       })
       .catch((err) => console.log(err));
@@ -71,18 +73,16 @@ function EditExercise() {
 
   return (
     <div>
-      <h3 className="mb-3 mt-3">Create New Exercise Log</h3>
+      <h3 className="mb-3 mt-3">Edit Exercise</h3>
       <form onSubmit={handleSubmit}>
         <div className="input-group mb-3">
           <label className="input-group-text">Username: </label>
           <select
-            // ref={inputRef}
             required
             className="form-select"
+            name="username"
             value={exerciseInfo.username}
-            onChange={(e) =>
-              setExerciseInfo({ ...exerciseInfo, username: e.target.value })
-            }
+            onChange={handleChange}
           >
             {users.map((user) => {
               return (
@@ -98,10 +98,9 @@ function EditExercise() {
           <input
             type="text"
             className="form-control"
+            name="description"
             value={exerciseInfo.description}
-            onChange={(e) =>
-              setExerciseInfo({ ...exerciseInfo, description: e.target.value })
-            }
+            onChange={handleChange}
           />
         </div>
         <div className="input-group mb-3">
@@ -109,10 +108,9 @@ function EditExercise() {
           <input
             type="text"
             className="form-control"
+            name="duration"
             value={exerciseInfo.duration}
-            onChange={(e) =>
-              setExerciseInfo({ ...exerciseInfo, duration: e.target.value })
-            }
+            onChange={handleChange}
           />
         </div>
         <div className="input-group mb-3">
@@ -120,13 +118,9 @@ function EditExercise() {
           <div>
             <DatePicker
               className="form-control"
+              name="date"
               selected={exerciseInfo.date}
-              onChange={(date) =>
-                setExerciseInfo({
-                  ...exerciseInfo,
-                  date: date,
-                })
-              }
+              onChange={handleChange}
             />
           </div>
         </div>

@@ -35,7 +35,7 @@ function EditUser() {
 
   return (
     <div>
-      <h3 className="mb-3 mt-3">Create New User</h3>
+      <h3 className="mb-3 mt-3">Edit User</h3>
       <form onSubmit={handleSubmit}>
         <div className="input-group mb-3">
           <label className="input-group-text">Username: </label>

@@ -16,11 +16,13 @@ function ExerciseList() {
   };
 
   const clearExercises = () => {
-    exercises.map((exercise) => {
-      return axios
-        .delete(`http://localhost:5000/exercises/${exercise._id}`)
-        .then((res) => console.log(res.data));
+    exercises.map(async (exercise) => {
+      const res = await axios.delete(
+        `http://localhost:5000/exercises/${exercise._id}`
+      );
+      return console.log(res.data);
     });
+    setExercises([]);
   };
 
   useEffect(() => {

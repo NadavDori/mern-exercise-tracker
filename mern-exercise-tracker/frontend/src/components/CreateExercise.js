@@ -6,48 +6,56 @@ import "react-datepicker/dist/react-datepicker.css";
 
 function CreateExercise() {
   // Init state values
-  const [username, setUsername] = useState("");
-  const [desc, setDesc] = useState("");
-  const [duration, setDuration] = useState(0);
-  const [date, setDate] = useState(new Date());
+  const [exerciseInfo, setExerciseInfo] = useState({
+    username: "",
+    description: "",
+    duration: 0,
+    date: new Date(),
+  });
   const [users, setUsers] = useState([]);
 
   const navigate = useNavigate();
-  // const inputRef = useRef();
+
+  const handleChange = (e) => {
+    let name = "";
+    let value = "";
+    if (!(e instanceof Date)) {
+      name = e.target.name;
+      value = e.target.value;
+    } else {
+      name = "date";
+      value = e;
+    }
+    setExerciseInfo({ ...exerciseInfo, [name]: value });
+  };
 
   // Form submit handler - Add exercise
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newExercise = {
-      username,
-      description: desc,
-      duration,
-      date,
-    };
+    const newExercise = { ...exerciseInfo };
 
     axios
       .post("http://localhost:5000/exercises/add", newExercise)
-      .then((res) => console.log(res.data))
-      .then(() => {
+      .then((res) => {
+        console.log(res.data);
         navigate("/");
       })
       .catch((err) => console.log(err));
-
-    // Reset exercise states
-    setDesc("");
-    setDuration(0);
-    setDate(new Date());
   };
 
   useEffect(() => {
     // Get all users + first username
-    axios.get("http://localhost:5000/users").then((res) => {
-      if (res.data.length > 0) {
-        setUsers(res.data.map((user) => user.username));
-        setUsername(res.data[0].username);
-      }
-    });
+    axios
+      .get("http://localhost:5000/users")
+      .then((res) => {
+        if (res.data.length > 0) {
+          setUsers(res.data.map((user) => user.username));
+          setExerciseInfo({ ...exerciseInfo, username: res.data[0].username });
+        }
+      })
+      .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -57,11 +65,11 @@ function CreateExercise() {
         <div className="input-group mb-3">
           <label className="input-group-text">Username: </label>
           <select
-            // ref={inputRef}
             required
             className="form-select"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            value={exerciseInfo.username}
+            onChange={handleChange}
           >
             {users.map((user) => {
               return (
@@ -77,8 +85,9 @@ function CreateExercise() {
           <input
             type="text"
             className="form-control"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
+            name="description"
+            value={exerciseInfo.description}
+            onChange={handleChange}
           />
         </div>
         <div className="input-group mb-3">
@@ -86,8 +95,9 @@ function CreateExercise() {
           <input
             type="text"
             className="form-control"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            name="duration"
+            value={exerciseInfo.duration}
+            onChange={handleChange}
           />
         </div>
         <div className="input-group mb-3">
@@ -95,8 +105,9 @@ function CreateExercise() {
           <div>
             <DatePicker
               className="form-control"
-              selected={date}
-              onChange={(date) => setDate(date)}
+              name="date"
+              selected={exerciseInfo.date}
+              onChange={handleChange}
             />
           </div>
         </div>

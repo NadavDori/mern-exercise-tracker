@@ -1,8 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function CreateUser() {
   const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setUsername(value);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -13,10 +20,11 @@ function CreateUser() {
     // Add user to MongoDB
     axios
       .post("http://localhost:5000/users/add", newUser)
-      .then((res) => console.log(res.data))
+      .then((res) => {
+        console.log(res.data);
+        navigate("/users");
+      })
       .catch((err) => console.log(err));
-
-    setUsername("");
   };
 
   return (
@@ -28,8 +36,9 @@ function CreateUser() {
           <input
             type="text"
             className="form-control"
+            name="username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={handleChange}
           />
         </div>
         <button type="submit" className="btn btn-primary btn-sm">
